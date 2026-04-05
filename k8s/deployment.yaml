@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: springboot-deployment
+  namespace: raghavendra76-dev
   labels:
     app: student-app
 spec:
@@ -20,9 +21,20 @@ spec:
         ports:
         - containerPort: 8080
         env:
+        # Database Connection Configuration
         - name: SPRING_DATASOURCE_URL
           value: "jdbc:mysql://mysql:3306/student_db?allowPublicKeyRetrieval=true&useSSL=false"
         - name: SPRING_DATASOURCE_USERNAME
           value: "admin"
         - name: SPRING_DATASOURCE_PASSWORD
           value: "admin123"
+
+        # AWS S3 Credentials (Required to stop the crash)
+        - name: AWS_ACCESS_KEY
+          value: "REPLACE_WITH_YOUR_AWS_ACCESS_KEY"
+        - name: AWS_SECRET_KEY
+          value: "REPLACE_WITH_YOUR_AWS_SECRET_KEY"
+        - name: AWS_REGION
+          value: "us-east-1" # Change this if your bucket is in a different region
+        - name: AWS_S3_BUCKET
+          value: "REPLACE_WITH_YOUR_BUCKET_NAME"
