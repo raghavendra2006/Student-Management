@@ -4,8 +4,8 @@ metadata:
   name: springboot-service
 spec:
   selector:
-    app: student-app   # This MUST match the labels in your deployment.yaml
+    app: student-app
   ports:
     - protocol: TCP
-      port: 80         # This is the port for the Service
-      targetPort: 8080 # 👈 This MUST be 8080 to reach your Spring Boot app
+      port: 80
+      targetPort: 8080
