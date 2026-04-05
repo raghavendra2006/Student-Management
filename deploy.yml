@@ -1,59 +1,37 @@
 ---
-- name: Setup Docker on all Ubuntu Servers
-  hosts: all
-  become: yes
-  tasks:
-    - name: Update apt and install Docker
-      apt:
-        name: docker.io
-        state: present
-        update_cache: yes
-
-    - name: Ensure Docker service is running
-      service:
-        name: docker
-        state: started
-        enabled: yes
-
-- name: Deploy MySQL to DB Server
+- name: Setup Database Server
   hosts: db_servers
   become: yes
   tasks:
-    - name: Run MySQL Container
+    - name: Install Docker
+      apt: { name: docker.io, state: present, update_cache: yes }
+    - name: Run MySQL
       docker_container:
         name: mysql
         image: mysql:8.0
         state: started
-        restart_policy: always
-        ports:
-          - "3306:3306"
+        ports: ["3306:3306"]
         env:
           MYSQL_DATABASE: "student_db"
-          MYSQL_USER: "admin"
-          MYSQL_PASSWORD: "admin123"
           MYSQL_ROOT_PASSWORD: "root"
 
-- name: Deploy Spring Boot to App Server
+- name: Setup App Server
   hosts: app_servers
   become: yes
   tasks:
-    - name: Pull latest Spring Boot Image
-      docker_image:
-        name: "raghavendra76/student-app"
-        source: pull
-
-    - name: Run Spring Boot Container
+    - name: Install Docker
+      apt: { name: docker.io, state: present }
+    - name: Run Spring Boot App
       docker_container:
         name: student-app
         image: "raghavendra76/student-app:latest"
         state: started
-        restart_policy: always
-        ports:
-          - "8080:8080"
+        pull: yes
+        ports: ["8080:8080"]
         env:
-          # 👇 REPLACE 'DB_PRIVATE_IP' with your DB Server's actual Private IP
+          # 👇 Point to DB Private IP
           SPRING_DATASOURCE_URL: "jdbc:mysql://172.31.20.80:3306/student_db?useSSL=false"
-          SPRING_DATASOURCE_USERNAME: "admin"
-          SPRING_DATASOURCE_PASSWORD: "admin123"
+          SPRING_DATASOURCE_USERNAME: "root"
+          SPRING_DATASOURCE_PASSWORD: "root"
           AWS_ACCESS_KEY: "{{ AWS_KEY }}"
           AWS_SECRET_KEY: "{{ AWS_SECRET }}"
