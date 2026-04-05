@@ -14,6 +14,13 @@ spec:
     spec:
       containers:
       - name: springboot-container
-        image: raghavendra76/student-app:latest   # 🔥 your docker image
+        image: raghavendra76/student-app:latest
+        imagePullPolicy: Always  # 👈 This ensures the fresh image is always pulled
         ports:
         - containerPort: 8080
+        # Optional: Environment variables if your app needs them at runtime
+        env:
+        - name: AWS_REGION
+          value: "us-east-1"
+        - name: AWS_S3_BUCKET
+          value: "student-managementttttttt"
