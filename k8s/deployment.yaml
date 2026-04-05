@@ -15,11 +15,24 @@ spec:
       containers:
       - name: springboot-container
         image: raghavendra76/student-app:latest
-        imagePullPolicy: Always  # 👈 This ensures the fresh image is always pulled
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
-        # Optional: Environment variables if your app needs them at runtime
         env:
+        # --- Internal Database Connection ---
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:mysql://mysql:3306/student_db?createDatabaseIfNotExist=true&useSSL=false"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "root"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "root"
+
+        # --- AWS Credentials (Placeholders) ---
+        # We will set the real values in the OpenShift Console
+        - name: AWS_ACCESS_KEY_ID
+          value: "REPLACED_IN_CONSOLE"
+        - name: AWS_SECRET_ACCESS_KEY
+          value: "REPLACED_IN_CONSOLE"
         - name: AWS_REGION
           value: "us-east-1"
         - name: AWS_S3_BUCKET
