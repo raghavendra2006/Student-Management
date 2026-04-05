@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="top-bar">
+    <h2>🎓 Student Dashboard</h2>
+
+    <div class="actions">
+        <button class="gold-btn" onclick="openModal()">➕ Add Student</button>
+
+        <select id="sort" onchange="applySort()">
+            <option value="">Sort By</option>
+            <option value="ageAsc">Age ↑</option>
+            <option value="ageDesc">Age ↓</option>
+            <option value="name">Name</option>
+            <option value="gender">Gender</option>
+            <option value="skills">Top 3 Skills</option>
+        </select>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Roll</th>
+            <th>Branch</th>
+            <th>Skills</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="studentTable"></tbody>
+    </table>
+</div>
+
+<div class="pagination">
+    <button class="gold-btn" onclick="prevPage()">⬅ Prev</button>
+    <button class="gold-btn" onclick="nextPage()">Next ➡</button>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+    <div class="modal-content glass">
+
+        <h3 id="modalTitle">Add Student</h3>
+
+        <div class="form-grid">
+            <input type="text" id="name" placeholder="Name">
+            <input type="text" id="rollNumber" placeholder="Roll Number">
+            <input type="text" id="branch" placeholder="Branch">
+            <input type="text" id="college" placeholder="College">
+            <input type="text" id="skills" placeholder="Skills">
+            <input type="email" id="email" placeholder="Email">
+            <input type="text" id="phone" placeholder="Phone">
+            <input type="number" id="age" placeholder="Age">
+            <input type="text" id="gender" placeholder="Gender">
+        </div>
+
+        <input type="file" id="file">
+
+        <div class="modal-actions">
+            <button class="gold-btn" onclick="submitStudent()">Save</button>
+            <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+        </div>
+
+    </div>
+</div>
+
+<script src="/script.js"></script>
+</body>
+</html>
