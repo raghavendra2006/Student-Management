@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: springboot-deployment
+  labels:
+    app: student-app
 spec:
   replicas: 1
   selector:
@@ -13,27 +15,14 @@ spec:
         app: student-app
     spec:
       containers:
-      - name: springboot-container
+      - name: student-app
         image: raghavendra76/student-app:latest
-        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:
-        # --- Internal Database Connection ---
         - name: SPRING_DATASOURCE_URL
-          value: "jdbc:mysql://mysql:3306/student_db?createDatabaseIfNotExist=true&useSSL=false"
+          value: "jdbc:mysql://mysql:3306/student_db?allowPublicKeyRetrieval=true&useSSL=false"
         - name: SPRING_DATASOURCE_USERNAME
-          value: "root"
+          value: "admin"
         - name: SPRING_DATASOURCE_PASSWORD
-          value: "root"
-
-        # --- AWS Credentials (Placeholders) ---
-        # We will set the real values in the OpenShift Console
-        - name: AWS_ACCESS_KEY_ID
-          value: "REPLACED_IN_CONSOLE"
-        - name: AWS_SECRET_ACCESS_KEY
-          value: "REPLACED_IN_CONSOLE"
-        - name: AWS_REGION
-          value: "us-east-1"
-        - name: AWS_S3_BUCKET
-          value: "student-managementttttttt"
+          value: "admin123"
