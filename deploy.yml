@@ -4,33 +4,46 @@
   become: yes
   tasks:
     - name: Install Docker
-      apt: { name: docker.io, state: present, update_cache: yes }
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
     - name: Run MySQL
       docker_container:
         name: mysql
         image: mysql:8.0
         state: started
-        ports: ["3306:3306"]
+        restart_policy: always
+        ports:
+          - "3306:3306"
         env:
           MYSQL_DATABASE: "student_db"
           MYSQL_ROOT_PASSWORD: "root"
+          # 👇 This ensures the root user can be accessed from your App Server IP
+          MYSQL_ROOT_HOST: "%"
 
 - name: Setup App Server
   hosts: app_servers
   become: yes
   tasks:
     - name: Install Docker
-      apt: { name: docker.io, state: present }
+      apt:
+        name: docker.io
+        state: present
+
     - name: Run Spring Boot App
       docker_container:
         name: student-app
         image: "raghavendra76/student-app:latest"
         state: started
         pull: yes
-        ports: ["8080:8080"]
+        recreate: yes # 👈 Forces Docker to replace the old crashed container
+        restart_policy: always
+        ports:
+          - "8080:8080"
         env:
-          # 👇 Point to DB Private IP
-          SPRING_DATASOURCE_URL: "jdbc:mysql://172.31.20.80:3306/student_db?useSSL=false"
+          SPRING_DATASOURCE_URL: "jdbc:mysql://172.31.20.80:3306/student_db?allowPublicKeyRetrieval=true&useSSL=false"
           SPRING_DATASOURCE_USERNAME: "root"
           SPRING_DATASOURCE_PASSWORD: "root"
           AWS_ACCESS_KEY: "{{ AWS_KEY }}"
