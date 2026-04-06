@@ -37,7 +37,7 @@
         image: "raghavendra76/student-app:latest"
         state: started
         pull: yes
-        recreate: yes 
+        recreate: yes
         restart_policy: always
         ports:
           - "8080:8080"
@@ -45,9 +45,8 @@
           SPRING_DATASOURCE_URL: "jdbc:mysql://172.31.20.80:3306/student_db?allowPublicKeyRetrieval=true&useSSL=false"
           SPRING_DATASOURCE_USERNAME: "root"
           SPRING_DATASOURCE_PASSWORD: "root"
-          # 👇 Updated to standard AWS naming conventions
+          # 👇 CATCH-ALL AWS CREDENTIALS (Fixes the S3 crash)
           AWS_ACCESS_KEY_ID: "{{ AWS_KEY }}"
           AWS_SECRET_ACCESS_KEY: "{{ AWS_SECRET }}"
-          # 👇 Keeping these as well for safety
           AWS_ACCESS_KEY: "{{ AWS_KEY }}"
           AWS_SECRET_KEY: "{{ AWS_SECRET }}"
