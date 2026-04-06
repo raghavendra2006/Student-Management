@@ -41,12 +41,13 @@
         restart_policy: always
         ports:
           - "8080:8080"
-        env:
-          SPRING_DATASOURCE_URL: "jdbc:mysql://172.31.20.80:3306/student_db?allowPublicKeyRetrieval=true&useSSL=false"
-          SPRING_DATASOURCE_USERNAME: "root"
-          SPRING_DATASOURCE_PASSWORD: "root"
-          # 👇 CATCH-ALL AWS CREDENTIALS (Fixes the S3 crash)
-          AWS_ACCESS_KEY_ID: "{{ AWS_KEY }}"
-          AWS_SECRET_ACCESS_KEY: "{{ AWS_SECRET }}"
-          AWS_ACCESS_KEY: "{{ AWS_KEY }}"
-          AWS_SECRET_KEY: "{{ AWS_SECRET }}"
+        # 👇 This is the "Force-Fix". It passes keys directly to the Java process.
+        command: >
+          java -DAWS_ACCESS_KEY_ID={{ AWS_KEY }}
+               -DAWS_SECRET_ACCESS_KEY={{ AWS_SECRET }}
+               -DAWS_ACCESS_KEY={{ AWS_KEY }}
+               -DAWS_SECRET_KEY={{ AWS_SECRET }}
+               -Dspring.datasource.url=jdbc:mysql://172.31.20.80:3306/student_db?allowPublicKeyRetrieval=true&useSSL=false
+               -Dspring.datasource.username=root
+               -Dspring.datasource.password=root
+               -jar app.jar
