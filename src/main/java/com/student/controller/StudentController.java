@@ -21,18 +21,21 @@ public class StudentController {
     private final StudentService studentService;
     private final S3Service s3Service;
 
-    // ✅ CREATE
+    // ✅ CREATE (FIXED)
     @PostMapping(consumes = "multipart/form-data")
     public Student addStudent(
             @RequestParam("student") String studentJson,
-            @RequestParam("file") MultipartFile file
+            @RequestParam(value = "file", required = false) MultipartFile file
     ) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         Student student = mapper.readValue(studentJson, Student.class);
 
-        String imageUrl = s3Service.uploadFile(file);
-        student.setImageUrl(imageUrl);
+        // ✅ handle file safely
+        if (file != null && !file.isEmpty()) {
+            String imageUrl = s3Service.uploadFile(file);
+            student.setImageUrl(imageUrl);
+        }
 
         return studentService.addStudent(student);
     }
@@ -49,7 +52,7 @@ public class StudentController {
         return studentService.getStudentById(id);
     }
 
-    // ✅ UPDATE
+    // ✅ UPDATE (FIXED)
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public Student updateStudent(
             @PathVariable Long id,
@@ -70,7 +73,7 @@ public class StudentController {
         return "Student deleted successfully";
     }
 
-    // 🔥 FILTER + PAGINATION + SORT
+    // ✅ FILTER
     @GetMapping("/filter")
     public Page<Student> getStudents(
             @RequestParam(required = false) String skills,
