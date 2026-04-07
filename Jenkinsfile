@@ -73,6 +73,10 @@ pipeline {
             steps {
                 echo 'Deploying application to EC2 instance...'
                 withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+                    // Fix Windows SSH key permissions (ssh.exe strictly requires private keys to be protected)
+                    bat 'icacls "%SSH_KEY%" /inheritance:r /grant "%USERNAME%:F"'
+                    bat 'icacls "%SSH_KEY%" /remove "BUILTIN\\Users"'
+
                     // Copy docker-compose.yml to EC2 Server
                     bat "scp -o StrictHostKeyChecking=no -i \"%SSH_KEY%\" docker-compose.yml ${EC2_USER}@${EC2_IP}:~/docker-compose.yml"
                     
