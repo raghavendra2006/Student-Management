@@ -70,13 +70,13 @@ pipeline {
         stage('Deploy to EC2') {
             steps {
                 echo 'Deploying application to EC2 instance...'
-                sshagent([env.SSH_CREDENTIALS_ID]) {
+                withCredentials([sshUserPrivateKey(credentialsId: env.SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                     // Copy docker-compose.yml to EC2 Server
-                    bat "scp -o StrictHostKeyChecking=no docker-compose.yml ${EC2_USER}@${EC2_IP}:~/docker-compose.yml"
+                    bat "scp -o StrictHostKeyChecking=no -i \"%SSH_KEY%\" docker-compose.yml ${EC2_USER}@${EC2_IP}:~/docker-compose.yml"
                     
                     // Run deployment via SSH
                     bat """
-                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} "export DOCKER_IMAGE=${DOCKER_IMAGE}:latest && docker-compose down && docker-compose pull && docker-compose up -d"
+                        ssh -o StrictHostKeyChecking=no -i "%SSH_KEY%" ${EC2_USER}@${EC2_IP} "export DOCKER_IMAGE=${DOCKER_IMAGE}:latest && docker-compose down && docker-compose pull && docker-compose up -d"
                     """
                 }
             }
