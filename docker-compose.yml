@@ -1,16 +1,37 @@
-
 services:
   mysql:
     image: mysql:8
     container_name: mysql-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-root}
       MYSQL_DATABASE: student_db
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - student_network
+
+  app:
+    image: ${DOCKER_IMAGE:-student-management:latest}
+    container_name: backend-app
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/student_db
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-root}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-root}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET:-student-managementttttttt}
+    depends_on:
+      - mysql
+    networks:
+      - student_network
 
 volumes:
   mysql_data:
+
+networks:
+  student_network:
+    driver: bridge
