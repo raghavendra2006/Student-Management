@@ -36,7 +36,7 @@ pipeline {
         stage('Sonar Analysis') {
             steps {
                 echo 'Running SonarQube static code analysis...'
-                withSonarQubeEnv() {
+                withSonarQubeEnv('sonar') {
                     bat 'mvn sonar:sonar'
                 }
             }
