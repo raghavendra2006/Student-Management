@@ -62,8 +62,10 @@ pipeline {
         stage('Docker Push') {
             steps {
                 echo 'Pushing image to DockerHub...'
-                bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                bat "docker push ${DOCKER_IMAGE}:latest"
+                retry(3) {
+                    bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    bat "docker push ${DOCKER_IMAGE}:latest"
+                }
             }
         }
 
