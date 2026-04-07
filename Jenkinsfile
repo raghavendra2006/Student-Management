@@ -3,19 +3,19 @@ pipeline {
 
     environment {
         // --- Docker Properties ---
-        DOCKERHUB_CREDENTIALS = 'dockerhub-credentials-id'
-        DOCKER_IMAGE = 'yourdockerhubuser/student-management'
+        DOCKERHUB_CREDENTIALS = 'dockerhubcred'
+        DOCKER_IMAGE = 'raghavendra76/student-management'
         DOCKER_TAG = "v${env.BUILD_ID}"
         
         // --- EC2 Deployment Properties ---
         EC2_USER = 'ubuntu'
-        EC2_IP = 'your-ec2-ip-address'
-        SSH_CREDENTIALS_ID = 'ec2-ssh-key-id'
+        EC2_IP = '54.85.195.87'
+        SSH_CREDENTIALS_ID = 'ec2-pem-key'
     }
 
     tools {
-        maven 'Maven3' // Assuming Maven is configured as 'Maven3' in Global Tool Configuration
-        jdk 'JDK17'    // Assuming JDK 17 is configured as 'JDK17'
+        maven 'cseMaven' // Assuming Maven is configured as 'cseMaven' in Global Tool Configuration
+        jdk 'javacse'    // Assuming JDK 17 is configured as 'javacse'
     }
 
     stages {
@@ -29,18 +29,15 @@ pipeline {
         stage('Build Jar') {
             steps {
                 echo 'Building Spring Boot application...'
-                // If the Jenkins server doesn't have Maven configured in tools block, 
-                // you could also run: sh './mvnw clean package -DskipTests'
-                sh 'mvn clean package -DskipTests'
+                bat 'mvn clean package -DskipTests'
             }
         }
 
         stage('Sonar Analysis') {
             steps {
                 echo 'Running SonarQube static code analysis...'
-                // Requires SonarQube Scanner plugin configured as 'SonarQube-Server'
                 withSonarQubeEnv('SonarQube-Server') {
-                    sh 'mvn sonar:sonar'
+                    bat 'mvn sonar:sonar'
                 }
             }
         }
@@ -48,8 +45,8 @@ pipeline {
         stage('Docker Build') {
             steps {
                 echo 'Building Docker image...'
-                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
-                sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+                bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                bat "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
             }
         }
 
@@ -57,7 +54,8 @@ pipeline {
             steps {
                 echo 'Logging into DockerHub...'
                 withCredentials([usernamePassword(credentialsId: env.DOCKERHUB_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    // Windows CMD syntax for environment variables
+                    bat 'echo %DOCKER_PASS%| docker login -u %DOCKER_USER% --password-stdin'
                 }
             }
         }
@@ -65,8 +63,8 @@ pipeline {
         stage('Docker Push') {
             steps {
                 echo 'Pushing image to DockerHub...'
-                sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                sh "docker push ${DOCKER_IMAGE}:latest"
+                bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                bat "docker push ${DOCKER_IMAGE}:latest"
             }
         }
 
@@ -75,17 +73,11 @@ pipeline {
                 echo 'Deploying application to EC2 instance...'
                 sshagent([env.SSH_CREDENTIALS_ID]) {
                     // Copy docker-compose.yml to EC2 Server
-                    sh "scp -o StrictHostKeyChecking=no docker-compose.yml ${EC2_USER}@${EC2_IP}:~/docker-compose.yml"
+                    bat "scp -o StrictHostKeyChecking=no docker-compose.yml ${EC2_USER}@${EC2_IP}:~/docker-compose.yml"
                     
                     // Run deployment via SSH
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} '
-                            export DOCKER_IMAGE=${DOCKER_IMAGE}:latest
-                            # Optional: Export secrets into the environment here if needed
-                            docker-compose down
-                            docker-compose pull
-                            docker-compose up -d
-                        '
+                    bat """
+                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} "export DOCKER_IMAGE=${DOCKER_IMAGE}:latest && docker-compose down && docker-compose pull && docker-compose up -d"
                     """
                 }
             }
