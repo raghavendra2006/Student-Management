@@ -80,7 +80,7 @@ pipeline {
                     
                     // Run deployment via SSH
                     bat """
-                        ssh -o StrictHostKeyChecking=no -i "%SSH_KEY%" ${EC2_USER}@${EC2_IP} "export DOCKER_IMAGE=${DOCKER_IMAGE}:latest && docker-compose down && docker-compose pull && docker-compose up -d"
+                        ssh -o StrictHostKeyChecking=no -i "%SSH_KEY%" ${EC2_USER}@${EC2_IP} "export DOCKER_IMAGE=${DOCKER_IMAGE}:latest && sudo docker compose down && sudo docker compose pull && sudo docker compose up -d"
                     """
                 }
             }
