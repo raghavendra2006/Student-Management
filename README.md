@@ -105,6 +105,195 @@ Student-Management/
 
 ---
 
+## 📜 API Reference
+
+> **Base URL:** `http://54.85.195.87:8080`
+> Protected endpoints require: `Authorization: Bearer <jwt_token>` header.
+
+---
+
+### 🔐 Authentication
+
+#### Register a New User
+```
+POST /auth/register
+Content-Type: application/json
+```
+**Request Body:**
+```json
+{
+  "username": "admin",
+  "password": "secret123",
+  "role": "USER"
+}
+```
+**Response (200 OK):**
+```json
+{
+  "id": 1,
+  "username": "admin",
+  "role": "USER"
+}
+```
+
+---
+
+#### Login & Get JWT Token
+```
+POST /auth/login
+Content-Type: application/json
+```
+**Request Body:**
+```json
+{
+  "username": "admin",
+  "password": "secret123"
+}
+```
+**Response (200 OK):**
+```
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiJ9.xxxx  (raw JWT string)
+```
+
+---
+
+### 🎓 Student Management
+
+> All student endpoints require `Authorization: Bearer <token>` header.
+
+#### Get All Students
+```
+GET /students
+Authorization: Bearer <token>
+```
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "name": "Raghavendra",
+    "rollNumber": "CS101",
+    "branch": "CSE",
+    "college": "NIT",
+    "skills": "Java, Spring Boot, Docker",
+    "email": "raghu@example.com",
+    "phone": "9876543210",
+    "age": 21,
+    "gender": "Male",
+    "imageUrl": "https://s3.amazonaws.com/..."
+  }
+]
+```
+
+---
+
+#### Get Student by ID
+```
+GET /students/{id}
+Authorization: Bearer <token>
+```
+**Response (200 OK):** Single student object (same schema as above).
+
+---
+
+#### Add a New Student (with optional photo)
+```
+POST /students
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+```
+**Form Fields:**
+
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `student` | String (JSON) | ✅ Yes | Serialized student JSON |
+| `file` | File | ❌ No | Profile image (jpg/png) |
+
+**Example `student` JSON string:**
+```json
+{
+  "name": "Raghavendra",
+  "rollNumber": "CS101",
+  "branch": "CSE",
+  "college": "NIT",
+  "skills": "Java, Docker",
+  "email": "raghu@example.com",
+  "phone": "9876543210",
+  "age": 21,
+  "gender": "Male"
+}
+```
+**Response (200 OK):** Created student object with generated `id` and `imageUrl`.
+
+---
+
+#### Update an Existing Student
+```
+PUT /students/{id}
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+```
+**Form Fields:** Same as `POST /students`. Provide updated values.
+**Response (200 OK):** Updated student object.
+
+---
+
+#### Delete a Student
+```
+DELETE /students/{id}
+Authorization: Bearer <token>
+```
+**Response (200 OK):**
+```
+Student deleted successfully
+```
+
+---
+
+#### Filter, Sort & Paginate Students
+```
+GET /students/filter
+Authorization: Bearer <token>
+```
+**Query Parameters:**
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `page` | Integer | `0` | Page number (0-indexed) |
+| `size` | Integer | `4` | Number of records per page |
+| `sort` | String | `null` | Sort key: `ageAsc`, `ageDesc`, `name`, `gender`, `skills` |
+| `skills` | String | `null` | Filter by skill |
+| `gender` | String | `null` | Filter by gender |
+| `age` | Integer | `null` | Filter by exact age |
+
+**Example Request:**
+```
+GET /students/filter?page=0&size=4&sort=ageAsc&skills=Java
+```
+**Response (200 OK):**
+```json
+{
+  "content": [...],
+  "totalPages": 3,
+  "totalElements": 11,
+  "number": 0,
+  "size": 4
+}
+```
+
+---
+
+### 🖥️ Page Routes
+
+| Route | Description |
+| :--- | :--- |
+| `GET /login` | Renders the login HTML page |
+| `GET /signup` | Renders the registration HTML page |
+| `GET /dashboard` | Renders the main student management dashboard |
+| `GET /test` | Health check — returns `"Backend is working 🚀"` |
+
+---
+
 ## 🌟 Key Features
 
 ### 🔐 Security & Identity 
@@ -162,4 +351,3 @@ Student-Management/
 
 ---
 
-*Architected and Developed by Raghavendra*
