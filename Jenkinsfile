@@ -61,9 +61,11 @@ pipeline {
 
         stage('Docker Push') {
             steps {
-                echo 'Pushing image to DockerHub...'
-                bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                bat "docker push ${DOCKER_IMAGE}:latest"
+                echo 'Pushing image to DockerHub... (Note: Retrying automatically if Docker Desktop drops the connection)'
+                retry(5) {
+                    bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    bat "docker push ${DOCKER_IMAGE}:latest"
+                }
             }
         }
 
