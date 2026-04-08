@@ -36,7 +36,7 @@ graph TD
     subgraph "AWS EC2 Hosting (Dockerized)"
         Gateway["🔌 Port 8080"]:::server
         App["🚀 Spring Boot Backend <br>(REST API & JWT Auth)"]:::server
-        MySQL[("🛢️ MySQL 8 Database <br> (student_network)")]:::db
+        MySQL[("🛢️ MySQL 8 Database <br> (student_db)")]:::db
     end
 
     S3(("☁️ AWS S3 Bucket <br> (Image Storage)")):::cloud
@@ -334,11 +334,15 @@ GET /students/filter?page=0&size=4&sort=ageAsc&skills=Java
 
 2. **Supply AWS Environment Variables:**
    You must either add these inside of a `.env` file within the system directory, or inject them at runtime:
-   ```env
-   AWS_ACCESS_KEY_ID=your_access_key
-   AWS_SECRET_ACCESS_KEY=your_secret_key
-   AWS_S3_BUCKET=your_s3_bucket_name
-   ```
+    ```env
+    AWS_ACCESS_KEY_ID=your_access_key
+    AWS_SECRET_ACCESS_KEY=your_secret_key
+    AWS_REGION=your_aws_region (e.g., us-east-1)
+    AWS_S3_BUCKET=your_s3_bucket_name
+    ```
+
+    > [!TIP]
+    > You can also create a `.env` file in the root directory of the project. The application is configured to automatically load variables from this file using the `dotenv-java` library.
 
 3. **Start the Database & Application using Docker:**
    ```bash
