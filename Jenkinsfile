@@ -43,11 +43,9 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                echo 'Building Docker image... (Auto-retrying on Docker DNS timeouts)'
-                retry(3) {
-                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
-                    bat "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
-                }
+                echo 'Building Docker image...'
+                bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                bat "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
             }
         }
 
@@ -63,11 +61,9 @@ pipeline {
 
         stage('Docker Push') {
             steps {
-                echo 'Pushing image to DockerHub... (Note: Retrying automatically if Docker Desktop drops the connection)'
-                retry(5) {
-                    bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                    bat "docker push ${DOCKER_IMAGE}:latest"
-                }
+                echo 'Pushing image to DockerHub...'
+                bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                bat "docker push ${DOCKER_IMAGE}:latest"
             }
         }
 
