@@ -68,6 +68,43 @@ graph TD
 
 ---
 
+## 🛠️ Technology Stack
+
+| Domain | Technology / Framework | Usage |
+| :--- | :--- | :--- |
+| **Backend** | Java 17, Spring Boot 3 | API Routing, Data JPA, Security filters |
+| **Security** | Spring Security, JWT tokens | Secures API endpoints against unauthorized access |
+| **Frontend** | HTML5, Vanilla CSS, Vanilla JS | Responsive Glassmorphism UI, async Fetch API logic |
+| **Database** | MySQL 8 | Relational data persistence for Users and Students |
+| **Storage** | Amazon Web Services (AWS) S3 | Cloud Object Storage for student profile photos |
+| **Containers** | Docker Engine, Docker Compose | Orchestrates the App and Database on the cloud host |
+| **CI/CD** | Jenkins, Maven, Git, SonarQube | Automated Build, Test, Code Analysis, and Deployment |
+| **Cloud Hosting** | AWS EC2 (Ubuntu 24.04) | Production environment hosting the docker containers |
+
+---
+
+## 📂 Project Structure
+
+```text
+Student-Management/
+├── src/main/java/com/student/
+│   ├── config/               # JWT Security Filters & AWS S3 Configuration
+│   ├── controller/           # REST APIs & HTML Page Routing
+│   ├── model/                # JPA Database Entities (User, Student)
+│   ├── repository/           # Spring Data JPA Repositories
+│   └── service/              # Core Business Logic & AWS S3 Object Uploads
+├── src/main/resources/
+│   ├── static/               # Vanilla JS (script.js) & CSS styling (style.css)
+│   ├── templates/            # Dynamic HTML Views (login, signup, dashboard)
+│   └── application.properties# Core Spring Boot environment variable mappings
+├── Jenkinsfile               # Declarative Jenkins CI/CD Pipeline Configuration
+├── docker-compose.yml        # Docker Compose service orchestration blueprint
+├── Dockerfile                # Spring Boot App Container build instructions
+└── pom.xml                   # Maven dependencies and build plugins
+```
+
+---
+
 ## 🌟 Key Features
 
 ### 🔐 Security & Identity 
@@ -125,23 +162,4 @@ graph TD
 
 ---
 
-## 📜 API Documentation
-
-### Auth Controllers
-* `POST /auth/register` - Registers new user profiles.
-* `POST /auth/login` - Authenticates and returns the `Authorization` JWT Bearer Token.
-
-### App Controllers
-* `POST /students` - Inserts students dynamically alongside file/image parameters.
-* `GET /students` - Pulls standard raw array records.
-* `PUT /students/{id}` - Modifies student records dynamically.
-* `DELETE /students/{id}` - Wipes out records safely.
-* `GET /students/filter` - Handles UI sorting and dynamic query parameters.
-
-### Page Routes
-* `GET /login`
-* `GET /signup`
-* `GET /dashboard`
-
----
 *Architected and Developed by Raghavendra*
