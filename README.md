@@ -1,6 +1,72 @@
-# 🎓 Student Management System
+<h1 align="center">🎓 Student Management System</h1>
 
-A production-grade, full-stack Student Management Application built with Spring Boot, HTML/JS, and MySQL, fully containerized and deployed using an automated Jenkins CI/CD pipeline to AWS.
+<p align="center">
+  <b>A production-grade, full-stack application built with Spring Boot, Vanilla JS, and MySQL.</b><br>
+  <i>Fully containerized and deployed using an automated Jenkins CI/CD pipeline to AWS.</i>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java" alt="Java 17">
+  <img src="https://img.shields.io/badge/Spring_Boot-3.5.13-brightgreen?style=for-the-badge&logo=spring" alt="Spring Boot">
+  <img src="https://img.shields.io/badge/MySQL-8.0-blue?style=for-the-badge&logo=mysql" alt="MySQL">
+  <img src="https://img.shields.io/badge/Docker-Enabled-blue?style=for-the-badge&logo=docker" alt="Docker">
+  <img src="https://img.shields.io/badge/Jenkins-CI/CD-red?style=for-the-badge&logo=jenkins" alt="Jenkins">
+  <img src="https://img.shields.io/badge/AWS-EC2_%7C_S3-yellow?style=for-the-badge&logo=amazonaws" alt="AWS">
+</p>
+
+---
+
+## 🏗️ System Architecture & Workflow
+
+Below is the comprehensive architecture diagram illustrating the request lifecycle, data flow, and deployment pipeline for the Student Management System.
+
+```mermaid
+graph TD
+    %% Define Styles
+    classDef client fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef server fill:#bbf,stroke:#333,stroke-width:2px;
+    classDef db fill:#ff9,stroke:#333,stroke-width:2px;
+    classDef cloud fill:#ffdb58,stroke:#333,stroke-width:2px;
+    classDef devops fill:#ffcccb,stroke:#333,stroke-width:2px;
+
+    %% Nodes
+    User(("🧑‍💻 Client (Browser)")):::client
+    UI["🖥️ UI (HTML/JS/CSS)"]:::client
+    
+    subgraph "AWS EC2 Hosting (Dockerized)"
+        Gateway["🔌 Port 8080"]:::server
+        App["🚀 Spring Boot Backend <br>(REST API & JWT Auth)"]:::server
+        MySQL[("🛢️ MySQL 8 Database <br> (student_network)")]:::db
+    end
+
+    S3(("☁️ AWS S3 Bucket <br> (Image Storage)")):::cloud
+    
+    subgraph "CI/CD Pipeline"
+        GitHub["🐙 GitHub Repository"]:::devops
+        Jenkins["🤖 Jenkins Build Server"]:::devops
+        Sonar["🔍 SonarQube (Analysis)"]:::devops
+        DockerHub["🐳 Docker Hub"]:::devops
+    end
+
+    %% Workflow / Connections
+    User -- "Interacts" --> UI
+    UI -- "JSON + JWT Bearer <br> (Fetch API)" --> Gateway
+    Gateway --> App
+    
+    App -- "Validates & Routes" --> App
+    App -- "Reads/Writes Entity Data" --> MySQL
+    App -- "Uploads Student Photos <br> (aws-java-sdk)" --> S3
+    S3 -. "Returns Public Image URL" .-> App
+    
+    %% CI/CD Workflow
+    Developer(("👨‍💻 Developer")) -->|Git Push| GitHub
+    GitHub -->|Triggers Build| Jenkins
+    Jenkins -->|Code Scan| Sonar
+    Jenkins -->|Builds Image| DockerHub
+    Jenkins -->|SSH Deploy & <br> docker compose up| Gateway
+```
+
+---
 
 ## 🌟 Key Features
 
@@ -22,32 +88,13 @@ A production-grade, full-stack Student Management Application built with Spring 
 
 ---
 
-## 🛠️ Technology Stack
+## ⚙️ How It Works (The Request Lifecycle)
 
-| Domain | Technology / Framework |
-| :--- | :--- |
-| **Backend** | Java 17, Spring Boot (Web, Data JPA, Security) |
-| **Frontend** | HTML5, Vanilla CSS (Glassmorphism UI), Vanilla JS |
-| **Database** | MySQL 8 |
-| **Storage** | Amazon Web Services (AWS) S3 |
-| **Containers** | Docker Engine, Docker Compose v2 |
-| **CI/CD** | Jenkins, Maven, Git, SonarQube |
-| **Cloud Hosting** | AWS EC2 (Ubuntu 24.04) |
-
----
-
-## ⚙️ Architecture & Data Structures
-
-### Database Models
-- **`User` Table:** `id`, `username`, `password`, `role`
-- **`Student` Table:** `id`, `name`, `rollNumber`, `branch`, `college`, `skills`, `email`, `phone`, `age`, `gender`, `imageUrl`
-
-### System Workflow
-1. User interacts with the HTML dashboard.
-2. The `script.js` securely captures user token and form data (including `multipart/form-data` for images).
-3. The Spring Boot `@RestController` intercepts the requests.
-4. Images are autonomously dispatched using the `AWS SDK` directly to an S3 Bucket.
-5. Entity data is mapped and processed natively using Spring Data JPA with the internal MySQL Database container.
+1. **Client Interaction:** The user interacts with the `dashboard.html` UI.
+2. **Security:** The vanilla JS `script.js` attaches a JWT (`Authorization: Bearer <token>`) to HTTP requests via the Fetch API.
+3. **Backend Processing:** The Spring Boot `@RestController` intercepts the requests. Security filters validate the JWT.
+4. **Cloud Integration:** If a photo is attached (via `multipart/form-data`), the service dispatches it autonomously using the AWS SDK directly to an S3 Bucket and saves the public URL.
+5. **Persistence:** Entity data is mapped and processed natively using Spring Data JPA, running transactions against the internal MySQL Database container.
 
 ---
 
@@ -73,34 +120,28 @@ A production-grade, full-stack Student Management Application built with Spring 
    ```
 
 4. **Access the application:**
-   - **Frontend UI:** `http://localhost:8080/signup`
-   - **Backend API Testing / Health:** `http://localhost:8080/test`
-
----
-
-## 🔄 Automated Deployment Pipeline (Jenkins)
-
-The included `Jenkinsfile` orchestrates the complete production lifecycle:
-1. **Checkout SCM:** Clones code dynamically using Git plugins.
-2. **Build Jar:** Uses Maven to clean and package the Spring Boot executable `.jar`.
-3. **Sonar Analysis:** Injects temporary properties and analyzes the code to ensure bug-free pushes.
-4. **Docker Build:** Leverages the `Dockerfile` to build a `raghavendra76/student-management:latest` image based on Eclipse Temurin 17-jdk.
-5. **Docker Hub Push:** Streams the container into the cloud repository seamlessly.
-6. **Deploy to EC2:** Uses temporary SSH authorization to execute pulling and `docker compose up -d` execution cleanly on the remote production server.
+   - **Frontend UI:** [http://localhost:8080/signup](http://localhost:8080/signup)
+   - **Backend API Testing / Health:** [http://localhost:8080/test](http://localhost:8080/test)
 
 ---
 
 ## 📜 API Documentation
 
 ### Auth Controllers
-* `POST /auth/register` (Registers new admin profiles)
-* `POST /auth/login` (Fetches the `Authorization` Bearer Token)
+* `POST /auth/register` - Registers new user profiles.
+* `POST /auth/login` - Authenticates and returns the `Authorization` JWT Bearer Token.
 
 ### App Controllers
-* `POST /students` (Inserts students dynamically alongside file/image parameters)
-* `GET /students` (Pulls standard raw array records)
-* `PUT /students/{id}` (Modifies student records dynamically)
-* `DELETE /students/{id}` (Wipes out records safely)
-* `GET /students/filter` (Handles UI sorting and dynamic query parameters)
+* `POST /students` - Inserts students dynamically alongside file/image parameters.
+* `GET /students` - Pulls standard raw array records.
+* `PUT /students/{id}` - Modifies student records dynamically.
+* `DELETE /students/{id}` - Wipes out records safely.
+* `GET /students/filter` - Handles UI sorting and dynamic query parameters.
 
-*Developed by Raghavendra*
+### Page Routes
+* `GET /login`
+* `GET /signup`
+* `GET /dashboard`
+
+---
+*Architected and Developed by Raghavendra*
