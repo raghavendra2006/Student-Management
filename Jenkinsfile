@@ -43,9 +43,11 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                echo 'Building Docker image...'
-                bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
-                bat "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+                echo 'Building Docker image... (Auto-retrying on Docker DNS timeouts)'
+                retry(3) {
+                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                    bat "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+                }
             }
         }
 
