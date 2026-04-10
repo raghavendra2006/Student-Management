@@ -9,7 +9,7 @@ pipeline {
         
         // --- EC2 Deployment Properties ---
         EC2_USER = 'ubuntu'
-        EC2_IP = '54.85.195.87'
+        EC2_IP = '18.209.5.124'
         SSH_CREDENTIALS_ID = 'ec2-pem-key'
     }
 
